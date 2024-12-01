@@ -61,7 +61,7 @@ func sortNumbersInTwoLists(b []byte) (l1 []int, l2 []int) {
 func sumOfAllDistances(l1 []int, l2 []int) int {
 	var distance int
 	var sum int
-	for i, _ := range l1 {
+	for i := range l1 {
 		distance = l1[i] - l2[i]
 		sum += int(math.Abs(float64(distance)))
 	}
