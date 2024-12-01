@@ -17,14 +17,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	list1, list2 := sortNumbersInTwoLists(content)
+	list1, list2 := SortNumbersInTwoLists(content)
 
 	sort.Ints(list1[:])
 	sort.Ints(list2[:])
 
 	sum := sumOfAllDistances(list1, list2)
 
-	fmt.Println(sum)
+	fmt.Println("Sum of all differences: " + strconv.Itoa(sum))
+
+	var totalSimilarityScore int
+
+	for _, element := range list1 {
+		simScore := getSimilarityScoreOfNumber(element, list2)
+		totalSimilarityScore += simScore
+	}
+
+	fmt.Println("Total similarity score: " + strconv.Itoa(totalSimilarityScore))
 }
 
 func stringToInt(s string) int {
@@ -37,7 +46,7 @@ func stringToInt(s string) int {
 	return i
 }
 
-func sortNumbersInTwoLists(b []byte) (l1 []int, l2 []int) {
+func SortNumbersInTwoLists(b []byte) (l1 []int, l2 []int) {
 	var list1 []int
 	var list2 []int
 
@@ -67,4 +76,15 @@ func sumOfAllDistances(l1 []int, l2 []int) int {
 	}
 
 	return sum
+}
+
+func getSimilarityScoreOfNumber(number int, list []int) int {
+	var count int
+	for _, e := range list {
+		if e == number {
+			count++
+		}
+	}
+
+	return count * number
 }
