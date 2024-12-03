@@ -16,6 +16,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// var lines [][]string
 	var numbers []string
 	//true = going up, false = going down
 	var posneg bool
@@ -24,39 +25,56 @@ func main() {
 
 	scanner := bufio.NewScanner(strings.NewReader(string(content)))
 
-outerLoop:
+	file, err := os.Create("output.txt")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+
+scannerLoop:
 	for scanner.Scan() {
 		// The levels are either all increasing or all decreasing.
 		// Any two adjacent levels differ by at least one and at most three.
 		numbers = strings.Fields(scanner.Text())
 
-		if stringToInt(numbers[0]) < stringToInt(numbers[1]) {
-			posneg = true
-		} else {
-			posneg = false
-		}
+	numberLoop:
+		for index := range numbers {
 
-		for i, _ := range numbers {
-			if len(numbers) < i+2 {
-				continue
-			}
+			numbers2 := make([]string, len(numbers))
+			copy(numbers2, numbers)
+			numbers2 = remove(numbers2, index)
 
-			if posneg {
-				if stringToInt(numbers[i])-stringToInt(numbers[i+1]) > 0 {
-					continue outerLoop
-				}
+			if stringToInt(numbers2[0]) < stringToInt(numbers2[1]) {
+				posneg = true
 			} else {
-				if stringToInt(numbers[i])-stringToInt(numbers[i+1]) < 0 {
-					continue outerLoop
+				posneg = false
+			}
+
+			for a := range numbers2 {
+				if len(numbers2) < a+2 {
+					continue
+				}
+
+				if posneg {
+					if stringToInt(numbers2[a])-stringToInt(numbers2[a+1]) > 0 {
+						continue numberLoop
+					}
+				} else {
+					if stringToInt(numbers2[a])-stringToInt(numbers2[a+1]) < 0 {
+						continue numberLoop
+					}
+				}
+
+				difference = int(math.Abs(float64(stringToInt(numbers2[a]) - stringToInt(numbers2[a+1]))))
+				if difference > 3 || difference < 1 {
+					continue numberLoop
 				}
 			}
 
-			difference = int(math.Abs(float64(stringToInt(numbers[i]) - stringToInt(numbers[i+1]))))
-			if difference > 3 || difference < 1 {
-				continue outerLoop
-			}
+			safeLineCount++
+			continue scannerLoop
 		}
-		safeLineCount++
 	}
 
 	fmt.Println(safeLineCount)
@@ -70,4 +88,8 @@ func stringToInt(s string) int {
 	}
 
 	return i
+}
+
+func remove(s []string, index int) []string {
+	return append(s[:index], s[index+1:]...)
 }
