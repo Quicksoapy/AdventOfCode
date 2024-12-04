@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"regexp"
 	"strconv"
 )
@@ -17,11 +18,18 @@ func main() {
 	var total int
 	text := string(content)
 
+	// list instances of 'don't' and 'do', rip out everything inbetween, then send it to the regex?
+	// don't(.*?)do(?!n't) does not work in go because lookbehind (!?) isn't supported in go wehhh
+	cmd := exec.Command("python3", "regex.py", text)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	// Regular expression to match mul(<number>,<number>)
 	re := regexp.MustCompile(`mul\s*\((\d+)\s*,\s*(\d+)\)`)
-	// re := regexp.MustCompile("mul\\((\\d{1,3}),(\\d{1,3})\\)")
 
-	matches3 := re.FindAllStringSubmatch(text, -1)
+	matches3 := re.FindAllStringSubmatch(string(output), -1)
 
 	for _, match := range matches3 {
 		num1, _ := strconv.Atoi(match[1])
@@ -30,5 +38,4 @@ func main() {
 	}
 
 	fmt.Println(total)
-
 }
